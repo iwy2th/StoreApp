@@ -12,16 +12,17 @@ class SearchViewController: UIViewController {
   @IBOutlet weak var searchBar: UISearchBar!
   @IBOutlet weak var tableView: UITableView!
   var delegate : UISearchBarDelegate!
-  // keep track of whether a search has been done yet or not
+  // Keep track of whether a search has been done yet or not
   var hasSearched = false
-  // data Model
+  // Data Model
   var searchResults = [SearchResult]()
   // MARK: - View Did Load
   override func viewDidLoad() {
     super.viewDidLoad()
-    tableView.delegate = self
-    tableView.dataSource = self
     tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+    // Register nib
+    let cellNib = UINib(nibName: "SearchResultCell", bundle: nil)
+    tableView.register(cellNib, forCellReuseIdentifier: "SearchResultCell")
   }
 }
 // MARK: - Search Bar Delegate
@@ -56,20 +57,25 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
   }
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cellIdentifier = "SearchResultCell"
-    var cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier)
-    if cell == nil {
-      cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
+    let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) as! SearchResultCell
+    if searchResults.count == 0 {
+      cell.nameLabel.text = "(Nothing found)"
+      cell.artistNameLabel.text = ""
     } else {
-      if searchResults.count == 0 {
-        cell?.textLabel!.text = "(Nothing found)"
-        cell?.detailTextLabel!.text = ""
-      } else {
-        let searchResult = searchResults[indexPath.row]
-        cell?.textLabel?.text = searchResult.name
-        cell?.detailTextLabel?.text = searchResult.artistName
-      }
+      let searchResult = searchResults[indexPath.row]
+      cell.nameLabel.text = searchResult.name
+      cell.artistNameLabel.text = searchResult.artistName
     }
-
-    return cell!
+    return cell
+  }
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    tableView.deselectRow(at: indexPath, animated: true)
+  }
+  func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+    if searchResults.count == 0 {
+      return nil
+    } else {
+      return indexPath
+    }
   }
 }
