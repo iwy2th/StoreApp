@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7248911C2A4F319D00A99D78 /* LoadingCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7248911B2A4F319D00A99D78 /* LoadingCell.xib */; };
 		726A08492A4D18E300A8CF4D /* SearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 726A08482A4D18E300A8CF4D /* SearchResult.swift */; };
 		726A084D2A4D2B5B00A8CF4D /* SearchResultCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726A084C2A4D2B5B00A8CF4D /* SearchResultCell.xib */; };
 		726A08502A4D317A00A8CF4D /* SearchResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 726A084F2A4D317A00A8CF4D /* SearchResultCell.swift */; };
@@ -21,6 +22,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7248911B2A4F319D00A99D78 /* LoadingCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LoadingCell.xib; sourceTree = "<group>"; };
 		726A08482A4D18E300A8CF4D /* SearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResult.swift; sourceTree = "<group>"; };
 		726A084C2A4D2B5B00A8CF4D /* SearchResultCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SearchResultCell.xib; sourceTree = "<group>"; };
 		726A084F2A4D317A00A8CF4D /* SearchResultCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultCell.swift; sourceTree = "<group>"; };
@@ -68,6 +70,7 @@
 			isa = PBXGroup;
 			children = (
 				7270403D2A4C2811006FC4D2 /* Main.storyboard */,
+				7248911B2A4F319D00A99D78 /* LoadingCell.xib */,
 				726A084C2A4D2B5B00A8CF4D /* SearchResultCell.xib */,
 				726A08532A4D362100A8CF4D /* NothingFoundCell.xib */,
 			);
@@ -166,6 +169,7 @@
 			files = (
 				727040442A4C2812006FC4D2 /* LaunchScreen.storyboard in Resources */,
 				727040412A4C2812006FC4D2 /* Assets.xcassets in Resources */,
+				7248911C2A4F319D00A99D78 /* LoadingCell.xib in Resources */,
 				726A084D2A4D2B5B00A8CF4D /* SearchResultCell.xib in Resources */,
 				726A08542A4D362200A8CF4D /* NothingFoundCell.xib in Resources */,
 				7270403F2A4C2811006FC4D2 /* Main.storyboard in Resources */,

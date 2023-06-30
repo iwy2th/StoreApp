@@ -14,6 +14,8 @@ class SearchViewController: UIViewController {
   var delegate : UISearchBarDelegate!
   // Keep track of whether a search has been done yet or not
   var hasSearched = false
+  // downloading stuff
+  var isLoading = false
   // Data Model
   var searchResults = [SearchResult]()
   // MARK: - View Did Load
@@ -25,6 +27,8 @@ class SearchViewController: UIViewController {
     tableView.register(cellNib, forCellReuseIdentifier: CellIdentifiers.searchResultCell)
     cellNib = UINib(nibName: CellIdentifiers.nothingFoundCell, bundle: nil)
     tableView.register(cellNib, forCellReuseIdentifier: CellIdentifiers.nothingFoundCell)
+    cellNib = UINib(nibName: CellIdentifiers.loadingCell, bundle: nil)
+    tableView.register(cellNib, forCellReuseIdentifier: CellIdentifiers.loadingCell)
     // show keyboard on launch
     searchBar.becomeFirstResponder()
   }
@@ -36,95 +40,111 @@ extension SearchViewController: UISearchBarDelegate {
   func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
     if !searchBar.text!.isEmpty {
       searchBar.resignFirstResponder()
+      isLoading = true
+      tableView.reloadData()
       hasSearched = true
       searchResults = []
-      // get HTTP
-      let url = iTunesURL(searchText: searchBar.text!)
-      print("URL \(url)")
-      // parse JSON
-      if let data = performStoreRequest(with: url) {
-       searchResults = parse(data: data)
-        searchResults.sort(by: <)
+      let queue = DispatchQueue.global()
+      queue.async {
+        // get HTTP
+        let url = self.iTunesURL(searchText: searchBar.text!)
+        // parse JSON
+        if let data = self.performStoreRequest(with: url) {
+          self.searchResults = self.parse(data: data)
+          self.searchResults.sort(by: <)
+          DispatchQueue.main.async {
+            self.isLoading = false
+            self.tableView.reloadData()
+          }
+          return
+        }
       }
-      tableView.reloadData()
+
+      }
     }
-  }
-  func position(for bar: UIBarPositioning) -> UIBarPosition {
-    return .topAttached
-  }
-  // MARK: - URL for the request
-  func iTunesURL(searchText: String) -> URL {
-    let encodedText = searchText.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!
-    let urlString = String(format: "https://itunes.apple.com/search?term=%@", encodedText)
-    let url = URL(string: urlString)
-    return url!
-  }
-  func performStoreRequest(with url: URL) -> Data? {
-    do {
-      return try Data(contentsOf: url)
-    } catch {
-      print("Download Error: \(error.localizedDescription)")
-      showNetworkError()
-      return nil
+    func position(for bar: UIBarPositioning) -> UIBarPosition {
+      return .topAttached
     }
-  }
-  // MARK: - Parse JSON
-  func parse(data: Data) -> [SearchResult] {
-    do  {
-      let decoder = JSONDecoder()
-      let result = try decoder.decode(ResultArray.self, from: data)
-      return result.results
-    } catch {
-      print("JSON Error: \(error)")
-      return []
+    // MARK: - URL for the request
+    func iTunesURL(searchText: String) -> URL {
+      let encodedText = searchText.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!
+      let urlString = String(format: "https://itunes.apple.com/search?term=%@&limit=200", encodedText)
+      let url = URL(string: urlString)
+      return url!
     }
-  }
-  // MARK: - Error handling
+    func performStoreRequest(with url: URL) -> Data? {
+      do {
+        return try Data(contentsOf: url)
+      } catch {
+        print("Download Error: \(error.localizedDescription)")
+        showNetworkError()
+        return nil
+      }
+    }
+    // MARK: - Parse JSON
+    func parse(data: Data) -> [SearchResult] {
+      do  {
+        let decoder = JSONDecoder()
+        let result = try decoder.decode(ResultArray.self, from: data)
+        return result.results
+      } catch {
+        print("JSON Error: \(error)")
+        return []
+      }
+    }
+    // MARK: - Error handling
     func showNetworkError() {
       let alert = UIAlertController(title: "Whoops...", message: "There was an error accessing the iTunes Store" + "Please try again.", preferredStyle: .alert)
       alert.addAction(UIAlertAction(title: "OK", style: .default))
       present(alert, animated: true)
     }
 
-}
-// MARK: - Table View Delegate & Data Source
-extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    if !hasSearched {
-      return 0
-    } else if searchResults.count == 0 {
-      return 1
-    } else {
-      return searchResults.count
-    }
   }
-  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    if searchResults.count == 0 {
-      return tableView.dequeueReusableCell(withIdentifier: CellIdentifiers.nothingFoundCell, for: indexPath)
-    } else {
-      let cell = tableView.dequeueReusableCell(withIdentifier: CellIdentifiers.searchResultCell, for: indexPath) as! SearchResultCell
-      let searchResult = searchResults[indexPath.row]
-      cell.nameLabel.text = searchResult.name
-      if searchResult.artist.isEmpty {
-        cell.artistNameLabel.text = "Unknown"
+  // MARK: - Table View Delegate & Data Source
+  extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+      if isLoading {
+        return 1
+      } else if !hasSearched {
+        return 0
+      } else if searchResults.count == 0 {
+        return 1
       } else {
-        cell.artistNameLabel.text = String(format: "%@ (%@)", searchResult.artist, searchResult.type)
+        return searchResults.count
       }
-      return cell
+    }
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+      if isLoading {
+        let cell = tableView.dequeueReusableCell(withIdentifier: CellIdentifiers.loadingCell, for: indexPath)
+        let spinner = cell.viewWithTag(100) as! UIActivityIndicatorView
+        spinner.startAnimating()
+        return cell
+      } else if searchResults.count == 0 {
+        return tableView.dequeueReusableCell(withIdentifier: CellIdentifiers.nothingFoundCell, for: indexPath)
+      } else {
+        let cell = tableView.dequeueReusableCell(withIdentifier: CellIdentifiers.searchResultCell, for: indexPath) as! SearchResultCell
+        let searchResult = searchResults[indexPath.row]
+        cell.nameLabel.text = searchResult.name
+        if searchResult.artist.isEmpty {
+          cell.artistNameLabel.text = "Unknown"
+        } else {
+          cell.artistNameLabel.text = String(format: "%@ (%@)", searchResult.artist, searchResult.type)
+        }
+        return cell
+      }
+    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+      tableView.deselectRow(at: indexPath, animated: true)
+    }
+    func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+      if searchResults.count == 0 || isLoading {
+        return nil
+      } else {
+        return indexPath
+      }
     }
   }
-  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    tableView.deselectRow(at: indexPath, animated: true)
+  // MARK: - Operator overloading
+  func < (lhs: SearchResult, rhs: SearchResult) -> Bool {
+    return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
   }
-  func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-    if searchResults.count == 0 {
-      return nil
-    } else {
-      return indexPath
-    }
-  }
-}
-// MARK: - Operator overloading
-func < (lhs: SearchResult, rhs: SearchResult) -> Bool {
-  return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
-}
