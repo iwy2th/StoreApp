@@ -18,6 +18,8 @@ class SearchViewController: UIViewController {
   var isLoading = false
   // Data Model
   var searchResults = [SearchResult]()
+  // data task
+  var dataTask: URLSessionDataTask?
   // MARK: - View Did Load
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -41,6 +43,7 @@ extension SearchViewController: UISearchBarDelegate {
     if !searchBar.text!.isEmpty {
       searchBar.resignFirstResponder()
       isLoading = true
+      dataTask?.cancel()
       tableView.reloadData()
       hasSearched = true
       searchResults = []
@@ -48,10 +51,11 @@ extension SearchViewController: UISearchBarDelegate {
       //2
       let session = URLSession.shared
       //3
-      let dataTask = session.dataTask(with: url) { data, response, error in
-        //4
-        if let error = error {
+      dataTask = session.dataTask(with: url) { data, response, error in
+      //4
+        if let error = error as NSError?, error.code == -999 {
           print("Failure \(error.localizedDescription)")
+          return
         } else if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
           if let data {
             print("On main thread? " + (Thread.current.isMainThread ? "Yes" : "No"))
@@ -74,7 +78,7 @@ extension SearchViewController: UISearchBarDelegate {
         }
       }
       // 5
-      dataTask.resume()
+      dataTask?.resume()
       }
     }
     func position(for bar: UIBarPositioning) -> UIBarPosition {
