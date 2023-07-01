@@ -18,6 +18,7 @@
 		7270403C2A4C2811006FC4D2 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7270403B2A4C2811006FC4D2 /* SearchViewController.swift */; };
 		7270403F2A4C2811006FC4D2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7270403D2A4C2811006FC4D2 /* Main.storyboard */; };
 		727040412A4C2812006FC4D2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 727040402A4C2812006FC4D2 /* Assets.xcassets */; };
+		72DCD76C2A4FE6B4009D6BEA /* UIImageView+DownloadImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72DCD76B2A4FE6B4009D6BEA /* UIImageView+DownloadImage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		7270403E2A4C2811006FC4D2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		727040402A4C2812006FC4D2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		727040452A4C2812006FC4D2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		72DCD76B2A4FE6B4009D6BEA /* UIImageView+DownloadImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+DownloadImage.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +99,7 @@
 				727040372A4C2811006FC4D2 /* AppDelegate.swift */,
 				727040392A4C2811006FC4D2 /* SceneDelegate.swift */,
 				726A08512A4D34D600A8CF4D /* Constant.swift */,
+				72DCD76B2A4FE6B4009D6BEA /* UIImageView+DownloadImage.swift */,
 				726A084B2A4D18FD00A8CF4D /* Controller */,
 				726A084A2A4D18ED00A8CF4D /* Model */,
 				726A084E2A4D2B7000A8CF4D /* View */,
@@ -179,6 +182,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72DCD76C2A4FE6B4009D6BEA /* UIImageView+DownloadImage.swift in Sources */,
 				7270403C2A4C2811006FC4D2 /* SearchViewController.swift in Sources */,
 				727040382A4C2811006FC4D2 /* AppDelegate.swift in Sources */,
 				726A08492A4D18E300A8CF4D /* SearchResult.swift in Sources */,
