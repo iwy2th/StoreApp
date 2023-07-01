@@ -11,6 +11,7 @@ class SearchViewController: UIViewController {
   // MARK: - Properties
   @IBOutlet weak var searchBar: UISearchBar!
   @IBOutlet weak var tableView: UITableView!
+  @IBOutlet weak var segmentedControl: UISegmentedControl!
   var delegate : UISearchBarDelegate!
   // Keep track of whether a search has been done yet or not
   var hasSearched = false
@@ -34,12 +35,14 @@ class SearchViewController: UIViewController {
     // show keyboard on launch
     searchBar.becomeFirstResponder()
   }
-  
-}
+  @IBAction func segmentChanged(_ sender: UISearchBar) {
+    performSearch()
+  }
 
+}
 // MARK: - Search Bar Delegate
 extension SearchViewController: UISearchBarDelegate {
-  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+  func performSearch() {
     if !searchBar.text!.isEmpty {
       searchBar.resignFirstResponder()
       isLoading = true
@@ -47,7 +50,7 @@ extension SearchViewController: UISearchBarDelegate {
       tableView.reloadData()
       hasSearched = true
       searchResults = []
-      let url = iTunesURL(searchText: searchBar.text!)
+      let url = iTunesURL(searchText: searchBar.text!, category: segmentedControl.selectedSegmentIndex)
       //2
       let session = URLSession.shared
       //3
@@ -85,9 +88,16 @@ extension SearchViewController: UISearchBarDelegate {
       return .topAttached
     }
     // MARK: - URL for the request
-    func iTunesURL(searchText: String) -> URL {
+  func iTunesURL(searchText: String, category: Int) -> URL {
+    let kind: String
+    switch category {
+    case 1: kind = "musicTrack"
+    case 2: kind = "software"
+    case 3: kind = "ebook"
+    default: kind = ""
+    }
       let encodedText = searchText.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!
-      let urlString = String(format: "https://itunes.apple.com/search?term=%@&limit=200", encodedText)
+      let urlString = String(format: "https://itunes.apple.com/search?term=%@&limit=200&entity=\(kind)", encodedText)
       let url = URL(string: urlString)
       return url!
     }
