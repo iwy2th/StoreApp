@@ -38,9 +38,8 @@ class SearchViewController: UIViewController {
   @IBAction func segmentChanged(_ sender: UISearchBar) {
     performSearch()
   }
-
 }
-// MARK: - Search Bar Delegate
+// MARK: - Extension Search Bar Delegate
 extension SearchViewController: UISearchBarDelegate {
   func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
     performSearch()
@@ -124,7 +123,7 @@ extension SearchViewController: UISearchBarDelegate {
     }
 
   }
-  // MARK: - Table View Delegate & Data Source
+  // MARK: -  Extension Table View Delegate & Data Source
   extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
       if isLoading {
@@ -154,6 +153,7 @@ extension SearchViewController: UISearchBarDelegate {
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
       tableView.deselectRow(at: indexPath, animated: true)
+      performSegue(withIdentifier: "ShowDetail", sender: indexPath)
     }
     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
       if searchResults.count == 0 || isLoading {
@@ -162,8 +162,19 @@ extension SearchViewController: UISearchBarDelegate {
         return indexPath
       }
     }
+    // MARK: - Navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+      if segue.identifier == "ShowDetail" {
+        segue.destination.modalPresentationStyle = .overFullScreen
+        let detailViewController = segue.destination as! DetailViewController
+        let indexPath = sender as! IndexPath
+        let searchResult = searchResults[indexPath.row]
+        detailViewController.searchResult = searchResult
+      }
+    }
   }
   // MARK: - Operator overloading
   func < (lhs: SearchResult, rhs: SearchResult) -> Bool {
     return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
   }
+

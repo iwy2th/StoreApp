@@ -8,6 +8,7 @@
 import UIKit
 
 class SearchResultCell: UITableViewCell {
+  // MARK: - Properties
   @IBOutlet weak var artworkImageView: UIImageView!
   @IBOutlet weak var nameLabel: UILabel!
   @IBOutlet weak var artistNameLabel: UILabel!
