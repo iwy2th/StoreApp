@@ -22,6 +22,10 @@ class DetailViewController: UIViewController {
     print("deinit \(self)")
     downloadTask?.cancel()
   }
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+    transitioningDelegate = self
+  }
   // MARK: - ViewDidLoad
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -36,6 +40,11 @@ class DetailViewController: UIViewController {
     if searchResult != nil {
       updateUI()
     }
+    // Gradient view
+    view.backgroundColor = UIColor.clear
+    let dimmingView = GradientView(frame: CGRect.zero)
+    dimmingView.frame = view.bounds
+    view.insertSubview(dimmingView, at: 0)
   }
   @IBAction func close(_ sender: Any) {
     dismiss(animated: true)
@@ -75,9 +84,19 @@ class DetailViewController: UIViewController {
   }
 
 }
-// MARK: - Gesture recognizer
+// MARK: - Extension Gesture recognizer
 extension DetailViewController: UIGestureRecognizerDelegate {
   func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
     return (touch.view === self.view)
   }
+}
+// MARK: - Extension Animation
+extension DetailViewController: UIViewControllerTransitioningDelegate {
+  func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    return BounceAnimationController()
+  }
+  func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    return SlideOutAnimationController() 
+  }
+
 }
