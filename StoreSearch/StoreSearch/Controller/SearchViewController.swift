@@ -21,6 +21,8 @@ class SearchViewController: UIViewController {
   var searchResults = [SearchResult]()
   // data task
   var dataTask: URLSessionDataTask?
+  // track phone landscape
+  var landscapeVC: LandscapeViewController?
   // MARK: - View Did Load
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -34,6 +36,43 @@ class SearchViewController: UIViewController {
     tableView.register(cellNib, forCellReuseIdentifier: CellIdentifiers.loadingCell)
     // show keyboard on launch
     searchBar.becomeFirstResponder()
+  }
+  // MARK: - Device rotations
+  override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
+    super.willTransition(to: newCollection, with: coordinator)
+    switch newCollection.verticalSizeClass {
+    case .compact: showLandscape(with: coordinator)
+    case .regular, .unspecified: hideLandscape(with: coordinator)
+    @unknown default:
+      break
+    }
+  }
+  func showLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
+    // 1
+    guard landscapeVC == nil else { return }
+    // 2: Find the scene with the ID "..."
+    landscapeVC = storyboard!.instantiateViewController(withIdentifier: "LandscapeViewController") as? LandscapeViewController
+    if let landscapeVC {
+      // 3: Set the size and position of the new ViewController
+      landscapeVC.view.frame = view.bounds
+      landscapeVC.view.alpha = 0
+      // 4: Add the LandScape as subView
+      view.addSubview(landscapeVC.view)
+      addChild(landscapeVC) // Tell the SearchVC that the LandVC is now Managing screen
+      coordinator.animate { _ in
+        landscapeVC.view.alpha = 1
+      } completion: { _ in
+        landscapeVC.didMove(toParent: self) // SearchVC is the parent VC
+      }
+    }
+  }
+  func hideLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
+    if let controller = landscapeVC {
+     controller.willMove(toParent: nil)
+     controller.view.removeFromSuperview()
+     controller.removeFromParent()
+     landscapeVC = nil
+    }
   }
   @IBAction func segmentChanged(_ sender: UISearchBar) {
     performSearch()
